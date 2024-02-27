@@ -18,5 +18,6 @@ You can find a Client-side for this project here: [Client repo](https://github.c
 Methods:
 - GET
 - POST
-- PUT  
+- PUT
+- DELETE
 ```
