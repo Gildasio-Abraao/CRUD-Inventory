@@ -1,7 +1,5 @@
 package com.inventory.utils;
 
-import org.springframework.http.HttpStatus;
-
 import java.util.HashMap;
 
 public class HttpUtils {
@@ -11,7 +9,7 @@ public class HttpUtils {
         this.message = message;
     }
 
-    public HashMap<String, String> getResponse() {
+    public HashMap<String, String> setBodyResponse() {
         HashMap<String, String> response = new HashMap<String, String>();
         response.put("message", message);
 

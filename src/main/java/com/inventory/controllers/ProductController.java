@@ -2,6 +2,7 @@ package com.inventory.controllers;
 
 import com.inventory.models.ProductModel;
 import com.inventory.services.ProductService;
+import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +17,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/product")
 public class ProductController {
-    private Logger logger = LoggerFactory.getLogger(ProductController.class);
+    private final Logger logger = LoggerFactory.getLogger(ProductController.class);
     @Autowired
     private final ProductService productService;
 
@@ -30,13 +31,18 @@ public class ProductController {
         return productService.findAll();
     }
 
+    @GetMapping("{id}")
+    public ResponseEntity<ProductModel> findById(@PathVariable("id") String ID) {
+        return productService.findById(ID);
+    }
+
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<HashMap<String, String>> create(@RequestBody ProductModel product) {
+    public ResponseEntity<HashMap<String, String>> create(@RequestBody @Valid ProductModel product) {
         return productService.save(product);
     }
 
     @PutMapping(produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<HashMap<String, String>> update(@RequestBody ProductModel product) {
+    public ResponseEntity<HashMap<String, String>> update(@RequestBody @Valid ProductModel product) {
         return productService.update(product);
     }
 
