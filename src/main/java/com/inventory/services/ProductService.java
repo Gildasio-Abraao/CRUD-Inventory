@@ -1,18 +1,15 @@
 package com.inventory.services;
 
-import com.inventory.exceptions.ArgumentNotValidException;
 import com.inventory.exceptions.DocumentNotFoundException;
-import com.inventory.exceptions.GenericException;
 import com.inventory.models.ProductModel;
 import com.inventory.repositories.ProductRepository;
-import com.inventory.utils.HttpUtils;
-import com.mongodb.MongoBulkWriteException;
+import com.inventory.utils.HttpResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.logging.Logger;
@@ -40,33 +37,30 @@ public class ProductService {
         return productRepository.findAll();
     }
 
-    public ResponseEntity<HashMap<String, String>> save(ProductModel product) {
-        try {
-            productRepository.insert(product);
-        } catch (ArgumentNotValidException exception) {
-            logger.warning(exception.getMessage());
-        }
+    @Transactional
+    public ResponseEntity<HttpResponse> save(ProductModel product) {
+        productRepository.insert(product);
 
-        return ResponseEntity.status(HttpStatus.OK).body(new HttpUtils("Document saved successfully!").setBodyResponse());
+        return ResponseEntity.status(HttpStatus.CREATED).body(new HttpResponse(HttpStatus.CREATED.value(), "Document saved successfully!"));
     }
 
-    public ResponseEntity<HashMap<String, String>> update(ProductModel product) {
-        try {
-            productRepository.save(product);
-        } catch (ArgumentNotValidException exception) {
-            logger.warning(exception.getMessage());
-        }
+    @Transactional
+    public ResponseEntity<HttpResponse> update(ProductModel product) {
+        if(productRepository.findById(product.getId()).isEmpty())
+            throw new DocumentNotFoundException("No records found!");
 
-        return ResponseEntity.status(HttpStatus.OK).body(new HttpUtils("Document updated successfully!").setBodyResponse());
+        productRepository.save(product);
+
+        return ResponseEntity.status(HttpStatus.OK).body(new HttpResponse(HttpStatus.OK.value(), "Document updated successfully!"));
     }
 
-    public ResponseEntity<HashMap<String, String>> delete(String id) {
-        try {
-            productRepository.deleteById(id);
-        } catch (GenericException exception) {
-            logger.warning(exception.getMessage());
-        }
+    @Transactional
+    public ResponseEntity<HttpResponse> delete(String id) {
+        if(productRepository.findById(id).isEmpty())
+            throw new DocumentNotFoundException("No records found!");
 
-        return ResponseEntity.status(HttpStatus.OK).body(new HttpUtils("Document deleted successfully!").setBodyResponse());
+        productRepository.deleteById(id);
+
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(new HttpResponse(HttpStatus.ACCEPTED.value(), "Document deleted successfully!"));
     }
 }
